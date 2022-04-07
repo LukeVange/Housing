@@ -52,7 +52,7 @@ Using the window function, what are the top six postcodes by price in each year?
 SQL Queries:
 ALTER TABLE housing ADD Year INTEGER;
 
-I did this next command once for each year.
+/* I did this next command once for each year. */
 UPDATE housing 
     SET Year = '2018'
     WHERE DATE LIKE '%2018';
