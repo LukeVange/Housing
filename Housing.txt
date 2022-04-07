@@ -1,0 +1,66 @@
+This exercise was inspired by the House Property Sales Analysis on https://www.projectpro.io/article/sql-database-projects-for-data-analysis-to-practice/565
+I was unable to find the dataset they used so I used a similar one I found on Kaggle. 
+Found here https://www.kaggle.com/datasets/anthonypino/melbourne-housing-market
+
+
+Which date corresponds to the highest number of sales?
+28/10/2017 with 1,023,472,938, 17/03/2018 with 828,193,178 is second
+SQL Query:
+SELECT Date, SUM(price) as Price FROM housing
+	GROUP BY Date
+	ORDER BY SUM(price) DESC;
+
+Which postcode had the highest average price by sale?
+3126 with an average price of 1,480,533
+3206 was second with an average price of 1,429,655
+SQL Query:
+SELECT Postcode, ROUND(AVG(price)) as Average_Price from housing
+	GROUP BY postcode
+	ORDER BY AVG(price) DESC;
+
+Which year witnessed the lowest amount of sales?
+2018 with 4713 sales.
+SQL Query: 
+SELECT REPLACE((SUBSTR(Date, 6)), '/', '') AS Year, COUNT(Date) FROM housing
+    GROUP BY Year
+    ORDER by COUNT(Date) ASC;
+
+Notes: The date column didn't consistently use two letters for the month and consequently the substring function returned the one digit months with a forward slash in front of the year. I had to use the REPLACE() function to replace those forward slashes with a string containing no characters to delete them.
+
+Using the window function, what are the top six postcodes by price in each year?
+3186	236474188	2016	1
+3101	232362000	2016	2
+3121	225084760	2016	3
+3165	216545676	2016	4
+3204	208548500	2016	5
+3146	208366800	2016	6
+
+3186	332759750	2017	1
+3165	287733500	2017	2
+3124	286906300	2017	3
+3101	281876600	2017	4
+3040	278945000	2017	5
+3104	270397000	2017	6
+
+3124	69994000	2018	1
+3204	64639500	2018	2
+3040	60719500	2018	3
+3187	60145000	2018	4
+3186	59766000	2018	5
+3070	57959500	2018	6
+
+SQL Queries:
+ALTER TABLE housing ADD Year INTEGER;
+
+I did this next command once for each year.
+UPDATE housing 
+    SET Year = '2018'
+    WHERE DATE LIKE '%2018';
+
+SELECT Postcode, SUM(Price), Year, ROW_NUMBER() OVER (ORDER BY SUM(Price) DESC)
+FROM housing
+WHERE Year = 2018
+GROUP BY Postcode
+LIMIT 6;
+
+This was a tough one at first because of the way the Date column is formatted. I couldn't use it for these query the way I wanted. My solution was to add a column for the Year to use and partition the windows function on it - but that didn't work right because there were too many rows for 2016. So I settled for three separate window queries instead.
